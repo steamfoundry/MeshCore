@@ -15,6 +15,7 @@ bool radio_init() {
   fallback_clock.begin();
   rtc_clock.begin(Wire);
   radio_spi.begin(P_LORA_SCLK, P_LORA_MISO, P_LORA_MOSI, P_LORA_NSS);
+  if (!radio.std_init(&radio_spi)) return false;
   radio_driver.begin();
   return true;
 }
