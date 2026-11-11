@@ -2,12 +2,10 @@
 
 #define RADIOLIB_STATIC_ONLY 1
 #include <Arduino.h>
-#include <Mesh.h>
 #include <helpers/radiolib/RadioLibWrappers.h>
 #include <helpers/ESP32Board.h>
 #include <helpers/AutoDiscoverRTCClock.h>
 #include <helpers/sensors/EnvironmentSensorManager.h>
-#include <helpers/radiolib/CustomSX1262.h>
 #include <helpers/radiolib/CustomSX1262Wrapper.h>
 #include "QTPyESP32S2WIOBoard.h"
 
