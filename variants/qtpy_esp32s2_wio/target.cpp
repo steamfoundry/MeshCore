@@ -1,4 +1,8 @@
 #include <Arduino.h>
+#include <esp_gdbstub.h>
+#include <xtensa/config/core.h>
+#include <xtensa/corebits.h>
+#include <xtensa/xtensa_api.h>
 #include "target.h"
 
 QTPyESP32S2WIOBoard board;
@@ -15,6 +19,18 @@ WRAPPER_CLASS radio_driver(radio, board);
 ESP32RTCClock fallback_clock;
 AutoDiscoverRTCClock rtc_clock(fallback_clock);
 EnvironmentSensorManager sensors;
+
+static void gdbstub_exception_handler(XtExcFrame* frame) {
+  esp_gdbstub_panic_handler(frame);
+}
+
+void install_crash_gdbstub() {
+  for (int cause = 0; cause < XCHAL_EXCCAUSE_NUM; ++cause) {
+    if (cause != EXCCAUSE_LEVEL1_INTERRUPT) {
+      xt_set_exception_handler(cause, gdbstub_exception_handler);
+    }
+  }
+}
 
 
 bool radio_init() {

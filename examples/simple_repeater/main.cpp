@@ -36,10 +36,21 @@ static unsigned long userBtnDownAt = 0;
 #endif
 
 void setup() {
+#ifdef QTPY_ESP32S2_WIO
+  board.beginIndicator();
+  Serial0.begin(115200, SERIAL_8N1, RX, TX);
+  Serial0.println("QTPy debug UART ready");
+  install_crash_gdbstub();
+#endif
+
   Serial.begin(115200);
   delay(1000);
 
   board.begin();
+
+#ifdef QTPY_ESP32S2_WIO
+  Serial0.println("Board initialized");
+#endif
 
 #ifdef HAS_EXTERNAL_WATCHDOG
   external_watchdog.begin();
@@ -60,10 +71,20 @@ void setup() {
   }
 #endif
 
+#ifdef QTPY_ESP32S2_WIO
+  Serial0.println("Starting radio initialization");
+#endif
   if (!radio_init()) {
     MESH_DEBUG_PRINTLN("Radio init failed!");
+#ifdef QTPY_ESP32S2_WIO
+    Serial0.println("Radio initialization failed");
+    board.setIndicatorColor(32, 0, 0);
+#endif
     halt();
   }
+#ifdef QTPY_ESP32S2_WIO
+  Serial0.println("Radio initialization succeeded");
+#endif
 
   fast_rng.begin(radio_driver.getRngSeed());
 
