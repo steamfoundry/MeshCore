@@ -168,9 +168,9 @@ void loop() {
     command[0] = 0;
     len = 0;
   }
-#ifdef QTPY_ESP32S2_WIO      
+/*#ifdef QTPY_ESP32S2_WIO      
   while (Serial1.available() && len < sizeof(command)-1) {
-    char c = Serial.read();
+    char c = Serial1.read();
     if (c != '\n') {
       command[len++] = c;
       command[len] = 0;
@@ -178,7 +178,8 @@ void loop() {
     }
     if (c == '\r') break;
   }
-#else
+*/
+//#else
   while (Serial.available() && len < sizeof(command)-1) {
     char c = Serial.read();
     if (c != '\n') {
@@ -188,18 +189,18 @@ void loop() {
     }
     if (c == '\r') break;
   }
-#endif
+//#endif
   if (len == sizeof(command)-1) {  // buffer full: treat as a completed line
     command[sizeof(command)-2] = '\r';  // place end-of-line marker inside the buffer
     command[sizeof(command)-1] = 0;     // keep the buffer NUL-terminated
   }
 
   if (len > 0 && command[len - 1] == '\r') {  // received complete line
-#ifdef QTPY_ESP32S2_WIO      
-    Serial1.print('\n');
-#else
+///#ifdef QTPY_ESP32S2_WIO      
+//    Serial1.print('\n');
+//#else
     Serial.print('\n');
-#endif
+//#endif
     command[len - 1] = 0;  // replace newline with C string null terminator
     char reply[160];
     reply[0] = 0;
@@ -211,11 +212,11 @@ void loop() {
     the_mesh.handleCommand(0, command, reply);  // NOTE: there is no sender_timestamp via serial!
 #endif
     if (reply[0]) {
-#ifdef QTPY_ESP32S2_WIO      
-      Serial1.print("  -> "); Serial1.println(reply);
-#else
+//#ifdef QTPY_ESP32S2_WIO      
+//      Serial1.print("  -> "); Serial1.println(reply);
+//#else
       Serial.print("  -> "); Serial.println(reply);
-#endif
+//#endif
     }
 
     command[0] = 0;  // reset command buffer
