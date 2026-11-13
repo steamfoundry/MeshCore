@@ -40,8 +40,8 @@ void setup() {
   board.beginIndicator();
   Serial1.begin(115200, SERIAL_8N1, RX, TX);
   Serial1.println("QTPy debug UART ready");
-  for (int i = 0; i < 100; i++) {  //  Testing serial outputs to see which work.
-    Serial1.println("Serial1 test");
+  for (int i = 0; i < 10; i++) {  //  Testing serial outputs to see which work.
+    Serial1.println("Serial1 UART test");
     delay(100);
   }
   install_crash_gdbstub();
@@ -49,7 +49,7 @@ void setup() {
 
   Serial.begin(115200);
   delay(1000);
-  for (int i = 0; i < 100; i++) {  //  Testing serial outputs to see which work.
+  for (int i = 0; i < 10; i++) {  //  Testing serial outputs to see which work.
     Serial.println("Serial test");
     delay(100);
   }
