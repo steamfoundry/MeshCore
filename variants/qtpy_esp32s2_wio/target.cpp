@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <SPI.h>
+#include <helpers/radiolib/RadioLibWrappers.h>
 #include <esp_gdbstub.h>
 #include <xtensa/config/core.h>
 #include <xtensa/corebits.h>
@@ -34,13 +36,17 @@ void install_crash_gdbstub() {
 
 
 bool radio_init() {
-  
+  if (!Serial) {
+    Serial.begin(115200);
+    delay(1000);
+  }
+  Serial.println("starting radio_init");
   fallback_clock.begin();
   pinMode(18, INPUT); /*PIN_USER_BTN*/
 
- /*Use the Stemma QT port for I2C*/
-  Wire1.begin(PIN_BOARD_SDA, PIN_BOARD_SCL);
-  rtc_clock.begin(Wire1);
+ ///*Use the Stemma QT port for I2C*/
+  //.begin(PIN_BOARD_SDA, PIN_BOARD_SCL);
+  //rtc_clock.begin(Wire1);
 
 #if defined(P_LORA_SCLK)
   spi.begin(P_LORA_SCLK, P_LORA_MISO, P_LORA_MOSI);

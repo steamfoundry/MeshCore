@@ -6,7 +6,12 @@
 
 class QTPyESP32S2WIOBoard : public ESP32Board {
 public:
-  QTPyESP32S2WIOBoard() {}
+  QTPyESP32S2WIOBoard() {
+    ESP32Board::begin();
+    pinMode(P_LORA_RF_SWITCH, OUTPUT);   //check this
+    digitalWrite(P_LORA_RF_SWITCH, HIGH);
+  }
+
 
   const char* getManufacturerName() const override {
     return "Adafruit QTPy ESP32-S2 + Seeed Wio-SX1262";

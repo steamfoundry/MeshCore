@@ -38,18 +38,25 @@ static unsigned long userBtnDownAt = 0;
 void setup() {
 #ifdef QTPY_ESP32S2_WIO
   board.beginIndicator();
-  Serial0.begin(115200, SERIAL_8N1, RX, TX);
-  Serial0.println("QTPy debug UART ready");
+  Serial1.begin(115200, SERIAL_8N1, RX, TX);
+  Serial1.println("QTPy debug UART ready");
+  for (int i = 0; i < 100; i++) {  //  Testing serial outputs to see which work.
+    Serial1.println("Serial1 test");
+    delay(100);
+  }
   install_crash_gdbstub();
 #endif
 
   Serial.begin(115200);
   delay(1000);
-
+  for (int i = 0; i < 100; i++) {  //  Testing serial outputs to see which work.
+    Serial.println("Serial test");
+    delay(100);
+  }
   board.begin();
 
 #ifdef QTPY_ESP32S2_WIO
-  Serial0.println("Board initialized");
+  Serial1.println("Board initialized");
 #endif
 
 #ifdef HAS_EXTERNAL_WATCHDOG
@@ -72,18 +79,18 @@ void setup() {
 #endif
 
 #ifdef QTPY_ESP32S2_WIO
-  Serial0.println("Starting radio initialization");
+  Serial1.println("Starting radio initialization");
 #endif
   if (!radio_init()) {
     MESH_DEBUG_PRINTLN("Radio init failed!");
 #ifdef QTPY_ESP32S2_WIO
-    Serial0.println("Radio initialization failed");
+    Serial1.println("Radio initialization failed");
     board.setIndicatorColor(32, 0, 0);
 #endif
     halt();
   }
 #ifdef QTPY_ESP32S2_WIO
-  Serial0.println("Radio initialization succeeded");
+  Serial1.println("Radio initialization succeeded");
 #endif
 
   fast_rng.begin(radio_driver.getRngSeed());
@@ -116,7 +123,15 @@ void setup() {
   }
 
   Serial.print("Repeater ID: ");
+#ifdef QTPY_ESP32S2_WIO
+  Serial1.print("Repeater ID: ");
+#endif
+
   mesh::Utils::printHex(Serial, the_mesh.self_id.pub_key, PUB_KEY_SIZE); Serial.println();
+#ifdef QTPY_ESP32S2_WIO
+  mesh::Utils::printHex(Serial1, the_mesh.self_id.pub_key, PUB_KEY_SIZE); Serial1.println();
+#endif
+
 
   command[0] = 0;
 #ifdef ETHERNET_ENABLED
@@ -153,6 +168,17 @@ void loop() {
     command[0] = 0;
     len = 0;
   }
+#ifdef QTPY_ESP32S2_WIO      
+  while (Serial1.available() && len < sizeof(command)-1) {
+    char c = Serial.read();
+    if (c != '\n') {
+      command[len++] = c;
+      command[len] = 0;
+      Serial1.print(c);
+    }
+    if (c == '\r') break;
+  }
+#else
   while (Serial.available() && len < sizeof(command)-1) {
     char c = Serial.read();
     if (c != '\n') {
@@ -162,13 +188,18 @@ void loop() {
     }
     if (c == '\r') break;
   }
+#endif
   if (len == sizeof(command)-1) {  // buffer full: treat as a completed line
     command[sizeof(command)-2] = '\r';  // place end-of-line marker inside the buffer
     command[sizeof(command)-1] = 0;     // keep the buffer NUL-terminated
   }
 
   if (len > 0 && command[len - 1] == '\r') {  // received complete line
+#ifdef QTPY_ESP32S2_WIO      
+    Serial1.print('\n');
+#else
     Serial.print('\n');
+#endif
     command[len - 1] = 0;  // replace newline with C string null terminator
     char reply[160];
     reply[0] = 0;
@@ -180,7 +211,11 @@ void loop() {
     the_mesh.handleCommand(0, command, reply);  // NOTE: there is no sender_timestamp via serial!
 #endif
     if (reply[0]) {
+#ifdef QTPY_ESP32S2_WIO      
+      Serial1.print("  -> "); Serial1.println(reply);
+#else
       Serial.print("  -> "); Serial.println(reply);
+#endif
     }
 
     command[0] = 0;  // reset command buffer
@@ -209,6 +244,7 @@ void loop() {
       userBtnDownAt = millis();
     } else if ((unsigned long)(millis() - userBtnDownAt) >= USER_BTN_HOLD_OFF_MILLIS) {
       Serial.println("Powering off...");
+      
       board.powerOff();  // does not return
     }
   } else {
