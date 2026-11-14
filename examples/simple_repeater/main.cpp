@@ -37,26 +37,26 @@ static unsigned long userBtnDownAt = 0;
 
 void setup() {
 #ifdef QTPY_ESP32S2_WIO
-  board.beginIndicator();
-  Serial1.begin(115200, SERIAL_8N1, RX, TX);
+  //board.beginIndicator();
+  /*Serial1.begin(115200, SERIAL_8N1, RX, TX);
   Serial1.println("QTPy debug UART ready");
   for (int i = 0; i < 10; i++) {  //  Testing serial outputs to see which work.
     Serial1.println("Serial1 UART test");
     delay(100);
-  }
-  install_crash_gdbstub();
+  }*/
+  //install_crash_gdbstub();
 #endif
 
   Serial.begin(115200);
   delay(1000);
-  for (int i = 0; i < 10; i++) {  //  Testing serial outputs to see which work.
+  /*for (int i = 0; i < 10; i++) {  //  Testing serial outputs to see which work.
     Serial.println("Serial test");
     delay(100);
-  }
+  }*/
   board.begin();
 
 #ifdef QTPY_ESP32S2_WIO
-  Serial1.println("Board initialized");
+  //Serial1.println("Board initialized");
 #endif
 
 #ifdef HAS_EXTERNAL_WATCHDOG
@@ -79,18 +79,18 @@ void setup() {
 #endif
 
 #ifdef QTPY_ESP32S2_WIO
-  Serial1.println("Starting radio initialization");
+  //Serial1.println("Starting radio initialization");
 #endif
   if (!radio_init()) {
     MESH_DEBUG_PRINTLN("Radio init failed!");
 #ifdef QTPY_ESP32S2_WIO
-    Serial1.println("Radio initialization failed");
+    //Serial1.println("Radio initialization failed");
     board.setIndicatorColor(32, 0, 0);
 #endif
     halt();
   }
 #ifdef QTPY_ESP32S2_WIO
-  Serial1.println("Radio initialization succeeded");
+  //Serial1.println("Radio initialization succeeded");
 #endif
 
   fast_rng.begin(radio_driver.getRngSeed());
@@ -124,12 +124,12 @@ void setup() {
 
   Serial.print("Repeater ID: ");
 #ifdef QTPY_ESP32S2_WIO
-  Serial1.print("Repeater ID: ");
+  //Serial1.print("Repeater ID: ");
 #endif
 
   mesh::Utils::printHex(Serial, the_mesh.self_id.pub_key, PUB_KEY_SIZE); Serial.println();
 #ifdef QTPY_ESP32S2_WIO
-  mesh::Utils::printHex(Serial1, the_mesh.self_id.pub_key, PUB_KEY_SIZE); Serial1.println();
+  //mesh::Utils::printHex(Serial1, the_mesh.self_id.pub_key, PUB_KEY_SIZE); Serial1.println();
 #endif
 
 
